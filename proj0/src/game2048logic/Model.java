@@ -4,6 +4,7 @@ import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
 
+import java.util.Currency;
 import java.util.Formatter;
 
 
@@ -84,7 +85,13 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 2. Fill in this function.
+        for (int x = 0; x < size(); x++) {
+            for (int y = 0; y < size(); y++) {
+                if (tile(x, y) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -94,7 +101,13 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 3. Fill in this function.
+        for (int x = 0; x < size(); x++) {
+            for (int y = 0; y < size(); y++) {
+                if ((tile(x, y) != null) && (tile(x, y).value() == MAX_PIECE)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -105,7 +118,19 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        if (emptySpaceExists()) {
+            return true;
+        }
+        for (int x = 0; x < size(); x++) {
+            for (int y = 0; y < size(); y++) {
+                int currValue = tile(x, y).value();
+                if (x < size() - 1 && tile(x+1, y).value() == currValue) {
+                    return true;
+                } else if (y < size() - 1 && tile(x, y+1).value() == currValue) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -125,10 +150,33 @@ public class Model {
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
         Tile currTile = board.tile(x, y);
+        if (currTile == null || currTile.wasMerged()) {
+            return;
+        }
         int myValue = currTile.value();
         int targetY = y;
 
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
+        for (int r = y + 1; r < size(); r++) {
+            Tile targetTile = tile(x, r);
+            if (targetTile == null) {
+                targetY = r;
+            } else {
+                if (targetTile.value() == myValue && !targetTile.wasMerged()) {
+                    targetY = r;
+                }
+                break;
+            }
+        }
+
+        if (targetY != y) {
+            Tile targetTile = tile(x, targetY);
+            if (targetTile != null && targetTile.value() == myValue) {
+                board.move(x, targetY, currTile);
+                score += myValue * 2;
+            } else {
+                board.move(x, targetY, currTile);
+            }
+        }
     }
 
     /** Handles the movements of the tilt in column x of the board
@@ -137,11 +185,17 @@ public class Model {
      * so we are tilting the tiles in this column up.
      * */
     public void tiltColumn(int x) {
-        // TODO: Task 7. Fill in this function.
+        for (int r = size() - 1; r >= 0; r--) {
+            moveTileUpAsFarAsPossible(x, r);
+        }
     }
 
     public void tilt(Side side) {
-        // TODO: Tasks 8 and 9. Fill in this function.
+        board.setViewingPerspective(side);
+        for (int c = 0; c < size(); c++) {
+            tiltColumn(c);
+        }
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.
