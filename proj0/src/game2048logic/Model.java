@@ -4,7 +4,6 @@ import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
 
-import java.util.Currency;
 import java.util.Formatter;
 
 
@@ -124,9 +123,9 @@ public class Model {
         for (int x = 0; x < size(); x++) {
             for (int y = 0; y < size(); y++) {
                 int currValue = tile(x, y).value();
-                if (x < size() - 1 && tile(x+1, y).value() == currValue) {
+                if (x < size() - 1 && tile(x + 1, y).value() == currValue) {
                     return true;
-                } else if (y < size() - 1 && tile(x, y+1).value() == currValue) {
+                } else if (y < size() - 1 && tile(x, y + 1).value() == currValue) {
                     return true;
                 }
             }
