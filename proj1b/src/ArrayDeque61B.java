@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,9 +10,9 @@ import java.util.List;
  * @Create 2025/11/9 21:26
  * @Version 1.0
  */
-public class ArrayDeque61B<T> implements Deque61B<T>{
+public class ArrayDeque61B<T> implements Deque61B<T> {
 
-    private T[] item;
+    private T[] items;
     private int size;
     private int nextFirst;
     private int nextLast;
@@ -19,7 +20,7 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
     private static final int INITIAL_CAPACITY = 8;
 
     public ArrayDeque61B() {
-        item = (T[]) new Object[INITIAL_CAPACITY];
+        items = (T[]) new Object[INITIAL_CAPACITY];
         size = 0;
         nextFirst = 0;
         nextLast = 1;
@@ -27,46 +28,116 @@ public class ArrayDeque61B<T> implements Deque61B<T>{
 
     @Override
     public void addFirst(T x) {
+        if (size == items.length) {
+            resize(items.length * 2);
+        }
 
+        items[nextFirst] = x;
+        nextFirst = Math.floorMod(nextFirst - 1, items.length);
+        size++;
     }
 
     @Override
     public void addLast(T x) {
+        if (size == items.length) {
+            resize(items.length * 2);
+        }
 
+        items[nextLast] = x;
+        nextLast = Math.floorMod(nextLast + 1, items.length);
+        size++;
     }
 
     @Override
     public List<T> toList() {
-        return null;
+        List<T> returnList = new ArrayList<>();
+
+        if (isEmpty()) {
+            return returnList;
+        }
+
+        int current = Math.floorMod(nextFirst + 1, items.length);
+        for (int i = 0; i < size; i++) {
+            returnList.add(items[current]);
+            current = Math.floorMod(current + 1, items.length);
+        }
+        return returnList;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size == 0;
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     @Override
     public T removeFirst() {
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+
+        int firstIndex = Math.floorMod(nextFirst + 1, items.length);
+        T returnItem = items[firstIndex];
+        items[firstIndex] = null;
+        nextFirst = firstIndex;
+        size--;
+
+        if (items.length >= 2 * INITIAL_CAPACITY && size < items.length / 4) {
+            resize(items.length / 2);
+        }
+
+        return returnItem;
     }
 
     @Override
     public T removeLast() {
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+
+        int lastIndex = Math.floorMod(nextLast - 1, items.length);
+        T returnItem = items[lastIndex];
+        items[lastIndex] = null;
+        nextLast = lastIndex;
+        size--;
+
+        if (items.length >= 2 * INITIAL_CAPACITY && size < items.length / 4) {
+            resize(items.length / 2);
+        }
+
+        return returnItem;
     }
 
     @Override
     public T get(int index) {
-        return null;
+        if (index < 0 || index >= size) {
+            return null;
+        }
+
+        int current = Math.floorMod(nextFirst + 1 + index, items.length);
+        return items[current];
     }
 
     @Override
     public T getRecursive(int index) {
-        return null;
+        throw new UnsupportedOperationException("No need to implement getRecursive for proj 1b");
+    }
+
+    private void resize(int capacity) {
+        T[] newItems = (T[]) new Object[capacity];
+
+        int current = Math.floorMod(nextFirst + 1, items.length);
+        for (int i = 0; i < size; i++) {
+            newItems[i] = items[current];
+            current = Math.floorMod(current + 1, items.length);
+        }
+
+        items = newItems;
+        nextFirst = items.length - 1;
+        nextLast = size;
     }
 }
