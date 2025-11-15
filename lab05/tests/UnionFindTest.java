@@ -85,6 +85,59 @@ public class UnionFindTest {
      * Specifically, you may want to write a test for path compression and to check for the correctness
      * of all methods in your implementation.
      */
+    /**
+     * 测试路径压缩功能
+     */
+    @Test
+    public void pathCompressionTest() {
+        UnionFind uf = new UnionFind(6);
+        uf.union(0, 1);
+        uf.union(2, 3);
+        uf.union(1, 3);
+        assertThat(uf.parent(0)).isEqualTo(1);
+        assertThat(uf.parent(1)).isEqualTo(3);
+        assertThat(uf.parent(2)).isEqualTo(3);
+
+        assertThat(uf.find(0)).isEqualTo(3);
+
+        assertThat(uf.parent(0)).isEqualTo(3);
+    }
+
+    @Test
+    public void sizeOfTest() {
+        UnionFind uf = new UnionFind(5);
+        assertThat(uf.sizeOf(0)).isEqualTo(1);
+
+        uf.union(0, 1);
+        assertThat(uf.sizeOf(0)).isEqualTo(2);
+        assertThat(uf.sizeOf(1)).isEqualTo(2);
+
+        uf.union(2, 3);
+        uf.union(3, 4);
+        assertThat(uf.sizeOf(2)).isEqualTo(3);
+
+        uf.union(0, 2);
+        assertThat(uf.sizeOf(0)).isEqualTo(5);
+    }
+
+    @Test
+    public void parentTest() {
+        UnionFind uf = new UnionFind(3);
+        assertThat(uf.parent(0)).isEqualTo(-1);
+        assertThat(uf.parent(1)).isEqualTo(-1);
+        assertThat(uf.parent(2)).isEqualTo(-1);
+
+        uf.union(0, 1);
+        int root01 = uf.find(0);
+        if (root01 == 0) {
+            assertThat(uf.parent(1)).isEqualTo(0);
+            assertThat(uf.parent(0)).isLessThan(0);
+        } else {
+            assertThat(uf.parent(0)).isEqualTo(1);
+            assertThat(uf.parent(1)).isLessThan(0);
+        }
+    }
+
 
 }
 
