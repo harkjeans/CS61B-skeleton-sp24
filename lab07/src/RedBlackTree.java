@@ -50,7 +50,11 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param node
      */
     void flipColors(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
+        if (node != null && node.left != null && node.right != null) {
+            node.isBlack = !node.isBlack;
+            node.left.isBlack = !node.left.isBlack;
+            node.right.isBlack = !node.right.isBlack;
+        }
     }
 
     /**
@@ -61,8 +65,26 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+
+//               node (B)              newRoot (B)
+//                /    \                 /    \
+//        newRoot (R)   C      --->     A   node (R)
+//               /   \                       /   \
+//              A     B                     B     C
+
+        if (node == null || node.left == null) {
+            return node;
+        }
+
+        RBTreeNode<T> newRoot = node.left;
+        node.left = newRoot.right;
+        newRoot.right = node;
+
+        boolean tempColor = node.isBlack;
+        node.isBlack = newRoot.isBlack;
+        newRoot.isBlack = tempColor;
+
+        return newRoot;
     }
 
     /**
@@ -73,8 +95,26 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+
+//            node (B)                       newRoot (B)
+//            /    \                          /    \
+//           A    newRoot (R)    --->     node (R)  C
+//                  /   \                  /   \
+//                 B     C                A     B
+
+        if (node == null || node.right == null) {
+            return null;
+        }
+
+        RBTreeNode<T> newRoot = node.right;
+        node.right = newRoot.left;
+        newRoot.left = node;
+
+        boolean tempColor = node.isBlack;
+        node.isBlack = newRoot.isBlack;
+        newRoot.isBlack = tempColor;
+
+        return newRoot;
     }
 
     /**
@@ -105,17 +145,38 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: Insert (return) new red leaf node.
+        // Insert (return) new red leaf node.
+        if (node == null) {
+            return new RBTreeNode<>(false, item);
+        }
 
-        // TODO: Handle normal binary search tree insertion.
+        // Handle normal binary search tree insertion.
+        int cmp = item.compareTo(node.item);
+        if (cmp < 0) {
+            node.left = insert(node.left, item);
+        } else if (cmp > 0) {
+            node.right = insert(node.right, item);
+        } else {
+            return node;
+        }
 
-        // TODO: Rotate left operation
+        // Handle LLRBs
+        // Rotate left operation
+        if (isRed(node.right) && !isRed(node.left)) {
+            node = rotateLeft(node);
+        }
 
-        // TODO: Rotate right operation
+        // Rotate right operation
+        if (isRed(node.left) && isRed(node.left.left)) {
+            node = rotateRight(node);
+        }
 
-        // TODO: Color flip
+        // Color flip
+        if (isRed(node.left) && isRed(node.right)) {
+            flipColors(node);
+        }
 
-        return null; //fix this return statement
+        return node;
     }
 
 }
